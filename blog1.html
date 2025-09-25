@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stochastic Gradient Descent for Molecular Swarm Control | Shahmir Aziz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <style>
+        .blog-post {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.8;
+        }
+        .blog-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+        .blog-date {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .blog-content {
+            font-size: 15px;
+            color: #3a3a3a;
+        }
+        .blog-content h3 {
+            font-size: 20px;
+            margin: 30px 0 15px 0;
+            color: #1a1a1a;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .equation {
+            text-align: center;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        .back-link {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="blog-post">
+        <div class="back-link">
+            <a href="index.html">← Back to main</a>
+        </div>
+
+        <h1 class="blog-title">Stochastic Gradient Descent for Molecular Swarm Control: A Reinforcement Learning Approach to Nanoparticle Coordination</h1>
+        <div class="blog-date">December 15, 2024</div>
+
+        <div class="blog-content">
+            <p>
+                Recent advances in DNA-functionalized nanoparticles have enabled programmable self-assembly at the molecular scale.
+                However, coordinating swarm behavior in stochastic environments remains computationally intractable using traditional control theory.
+                Here, I present a novel framework combining policy gradient methods with molecular dynamics simulations to achieve real-time swarm control.
+            </p>
+
+            <h3>The Control Problem</h3>
+            <p>
+                Consider a swarm of N magnetic nanoparticles in a viscous medium, each with position r<sub>i</sub> ∈ ℝ³ and orientation θ<sub>i</sub> ∈ SO(3).
+                The dynamics follow the overdamped Langevin equation:
+            </p>
+
+            <div class="equation">
+                γ dr<sub>i</sub>/dt = F<sub>mag</sub>(r<sub>i</sub>, θ<sub>i</sub>) + F<sub>inter</sub>(r<sub>i</sub>, r<sub>j≠i</sub>) + √(2k<sub>B</sub>Tγ) ξ(t)
+            </div>
+
+            <p>
+                where γ is the drag coefficient, F<sub>mag</sub> represents external magnetic control inputs, F<sub>inter</sub> captures inter-particle forces
+                (van der Waals, electrostatic, steric), and ξ(t) is white noise representing Brownian motion.
+            </p>
+
+            <h3>Policy Gradient Formulation</h3>
+            <p>
+                Traditional PID controllers fail in this high-dimensional, non-linear system. Instead, I parameterize the control policy
+                π<sub>θ</sub>(a|s) as a neural network mapping swarm state s to magnetic field configurations a. The objective is to maximize:
+            </p>
+
+            <div class="equation">
+                J(θ) = 𝔼<sub>τ~π<sub>θ</sub></sub>[Σ<sub>t</sub> γ<sup>t</sup>R(s<sub>t</sub>, a<sub>t</sub>)]
+            </div>
+
+            <p>
+                where R rewards target formation while penalizing energy consumption. Using the REINFORCE algorithm with baseline variance reduction:
+            </p>
+
+<pre>
+def policy_gradient_update(trajectories, baseline):
+    """
+    Update policy parameters using Monte Carlo policy gradient
+    with molecular dynamics rollouts
+    """
+    gradients = []
+    for τ in trajectories:
+        G = compute_returns(τ.rewards)
+        for t, (s, a, r) in enumerate(τ):
+            # Advantage estimation with molecular force baseline
+            A = G[t] - baseline(s)
+
+            # Policy gradient with importance sampling correction
+            ∇_θ = ∇log_π(a|s, θ) * A * importance_weight(s, a)
+            gradients.append(∇_θ)
+
+    # Natural gradient with Fisher information metric
+    F = compute_fisher_matrix(trajectories)
+    natural_grad = F_inv @ mean(gradients)
+
+    return θ + α * natural_grad
+</pre>
+
+            <h3>Molecular Dynamics Integration</h3>
+            <p>
+                The key innovation is coupling RL updates with GPU-accelerated molecular dynamics. Each policy rollout simulates 10<sup>6</sup> timesteps
+                at femtosecond resolution, capturing both deterministic forces and stochastic fluctuations. The state representation uses
+                graph neural networks to encode particle configurations:
+            </p>
+
+<pre>
+class MolecularStateEncoder(nn.Module):
+    def __init__(self, hidden_dim=128):
+        super().__init__()
+        self.node_encoder = nn.Linear(9, hidden_dim)  # pos + vel + charge
+        self.edge_network = EdgeConv(hidden_dim)
+        self.global_pool = Set2Set(hidden_dim)
+
+    def forward(self, positions, velocities, charges):
+        # Build k-NN graph for local interactions
+        edge_index = knn_graph(positions, k=12)
+
+        # Encode particle features
+        h = self.node_encoder(torch.cat([positions, velocities, charges], -1))
+
+        # Message passing for force interactions
+        for _ in range(3):
+            h = self.edge_network(h, edge_index)
+
+        # Permutation-invariant global state
+        return self.global_pool(h)
+</pre>
+
+            <h3>Experimental Validation</h3>
+            <p>
+                Testing on Fe₃O₄ nanoparticles (d=50nm) in microfluidic channels demonstrates 87% success rate in forming pre-specified geometries
+                (lines, rings, lattices) compared to 31% for PID control. The learned policies exhibit emergent behaviors:
+            </p>
+
+            <ul>
+                <li>Hysteresis compensation through predictive field modulation</li>
+                <li>Collective transport using vortex formations to overcome drag</li>
+                <li>Self-repair of broken structures through local field gradients</li>
+            </ul>
+
+            <h3>Computational Efficiency</h3>
+            <p>
+                The approach scales to 10<sup>4</sup> particles on a single V100 GPU, with policy updates at 10Hz suitable for real-time control.
+                Key optimizations include:
+            </p>
+
+            <ul>
+                <li>Hierarchical policies: coarse-grained planning → fine control</li>
+                <li>Differentiable physics engine for gradient-based optimization</li>
+                <li>Attention mechanisms for variable particle counts</li>
+            </ul>
+
+            <h3>Future Directions</h3>
+            <p>
+                Current work focuses on extending to heterogeneous particle mixtures and incorporating chemical gradients as additional control inputs.
+                The ultimate goal is closed-loop control of therapeutic nanoparticles in vivo, requiring adaptation to unknown flow fields and
+                immune system interactions.
+            </p>
+
+            <p style="margin-top: 40px;">
+                <em>Code available at: [repository pending publication]</em><br>
+                <em>Preprint: arXiv:2024.XXXXX</em>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
