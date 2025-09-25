@@ -83,8 +83,10 @@
 
             <h3>Why This Matters</h3>
             <p>
-                Every nanoparticle that enters blood gets coated with proteins within seconds. This "corona" determines
-                everything - where the particle goes, how long it circulates, whether it triggers immune response.
+                Direct application to my lipid vesicle work - every nanoparticle that enters blood gets coated
+                with proteins within seconds. This "corona" determines everything - where the particle goes,
+                how long it circulates, whether it triggers immune response. For my asymmetric vesicles,
+                the corona formation is even more complex due to curvature variations.
                 Current methods (docking simulations) take 48 hours per protein. We have 3000+ plasma proteins.
                 That's 4 months of compute for one particle design. Completely impractical.
             </p>
@@ -219,7 +221,7 @@ class BindingPredictor(nn.Module):
             <h3>Experimental Validation</h3>
             <p>
                 Collaborated with Robinson lab to test predictions. Made 12 custom particles with
-                designed surface chemistries. Results:
+                designed surface chemistries (including 3 based on my asymmetric vesicle designs). Results:
             </p>
 
             <ul>
@@ -230,7 +232,8 @@ class BindingPredictor(nn.Module):
 
             <p>
                 The failure case had PEG mushroom configuration. Model never saw this during training.
-                Classic out-of-distribution failure.
+                Classic out-of-distribution failure. Similar to issues we faced with PEG-lipids in the
+                SOMA device coating - surface presentation matters enormously.
             </p>
 
             <h3>Current Focus</h3>

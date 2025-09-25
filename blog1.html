@@ -79,6 +79,7 @@
 
             <h3>Problem Statement</h3>
             <p>
+                Extension of my microrobotics work at Harvard - now controlling swarms instead of single robots.
                 Can't use classical control theory for coordinating 10^4 magnetic nanoparticles in blood flow.
                 PID controllers fail catastrophically above N=100 particles due to nonlinear inter-particle forces.
                 Need real-time control at 10Hz for surgical applications.
@@ -183,7 +184,9 @@ F = E[∇log_π * ∇log_π.T]  # Expectation over trajectories
             <h3>Experimental Setup</h3>
             <p>
                 Testing with Fe₃O₄ nanoparticles (50nm diameter) in glycerol solution.
-                8-coil electromagnetic array for 3D field control. OptiTrack motion capture for ground truth positions.
+                8-coil electromagnetic array for 3D field control (adapted from Harvard MicroRobotics setup).
+                OptiTrack motion capture for ground truth positions. Similar viscosity to what we saw
+                in the SOMA gastric tissue penetration studies.
             </p>
 
             <p>
@@ -197,6 +200,7 @@ F = E[∇log_π * ∇log_π.T]  # Expectation over trajectories
                 <li><strong>Week 15:</strong> Implement hierarchical policy (high-level planner → low-level controller)</li>
                 <li><strong>Week 16:</strong> Test in blood analog fluid (45% glycerol, 55% water + albumin)</li>
                 <li><strong>Week 17:</strong> Animal trials preparation (waiting on IACUC approval)</li>
+                <li><strong>Week 18:</strong> Integrate with lipid vesicle delivery system for targeted therapy</li>
             </ul>
 
             <h3>Open Questions</h3>
